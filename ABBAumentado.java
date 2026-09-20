@@ -4,13 +4,13 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
         K clave;
         V valor;
         Nodo<K, V> izq, der;
-        long tamaño;
+        int tamano;
 
         public Nodo ( K clave, V valor ) {
             this.clave = clave;
             this.valor = valor;
             izq = der = null;
-            tamaño = 1;
+            tamano = 1;
         } // <--> end Nodo constructor
 
 
@@ -18,10 +18,9 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
 
     private Nodo<K, V> raiz;
-    @SuppressWarnings("unused")
     private long visitas;
 
-    public ABBAumentado ( K key, V value ) {
+    public ABBAumentado () {
         this.raiz = null;
         this.visitas = 0;
     } // <-> end ABBAumentado constructor
@@ -44,6 +43,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
         // para utilizarlo en agregar
     private short agregar_recursivo ( K clave, V valor, Nodo<K, V> nodo ) {
+        this.visitas += 1;
         short tamaño_extra;
 
         // clave repetida
@@ -56,12 +56,12 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
             if ( nodo.izq == null ) {   // insercion directa
                 nodo.izq = new Nodo<K, V>( clave, valor );
-                nodo.tamaño += 1;
+                nodo.tamano += 1;
                 return 1;   // retorna 1 para modificar los tamaños de sus ancestros +1
             }
 
             tamaño_extra = agregar_recursivo( clave, valor, nodo.izq );    // recorrer a la izquierda (<-)
-            nodo.tamaño += tamaño_extra;
+            nodo.tamano += tamaño_extra;
             return tamaño_extra;
 
         // clave > nodo.clave (->)
@@ -69,12 +69,12 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
             if ( nodo.der == null ) { // insercion directa
                 nodo.der = new Nodo<K, V>( clave, valor );
-                nodo.tamaño += 1;
+                nodo.tamano += 1;
                 return 1;   // retorna 1 para modificar los tamaños de sus ancestros +1
             }
 
             tamaño_extra = agregar_recursivo( clave, valor, nodo.der );    // recocrrer a la derecha (->)
-            nodo.tamaño += tamaño_extra;
+            nodo.tamano += tamaño_extra;
             return tamaño_extra;
         }
 
