@@ -81,7 +81,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
         return -1;
     } // <-> end agregar recursivo method
-    // agregar <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // agregar -------------------------------------------------------------------------------------------
 
 
     // Eliminar >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -193,7 +193,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
             return temp_value;
         }
 
-    } // <-> end eliminar_recursivo method
+    } // <-> end eliminar_recursivo method (priv)
 
 
  
@@ -214,9 +214,94 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
         hijo.tamano -= 1;
         return extraer_sucesor (hijo, hijo.izq);  // baja por la izquierda buscando el minimo
 
-    } // <-> end extraer_sucesor method
+    } // <-> end extraer_sucesor method (priv)
 
-    // Eliminar <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // Eliminar -------------------------------------------------------------------------------------------
 
+
+    public int cuantosMenores ( K clave) {
+        if ( clave == null ) { throw new ClaveNulaException(); }
+
+        // CountSmallerA se encuentra en ConsultarRango
+        return CountSmallerA( clave, raiz, 0 );
+    }
+
+
+
+    // ConsultarRango >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public int consultarRango ( K a, K b) {
+        if ( a == null || b == null ) { throw new ClaveNulaException(); }
+        if ( a.compareTo( b ) > 0 ) { throw new RangoInvalidoException(" a < b (Rango invalido)"); }
+
+        return raiz.tamano - CountSmallerA( a, raiz, 0 ) - CountSmallerB( b, raiz, 0 );
+    }
+
+
+
+    // retorna la cantidad de elementos que son menores que 'a' (fuera de rango)
+    private int CountSmallerA ( K A, Nodo<K, V> nodo , int cantidad ) {
+        this.visitas++;
+        // casos bases
+            // 1. se encuentra una hoja nula (subarbol vacio)
+        if ( nodo == null ) { return cantidad; }
+
+            // 2. se encuentra 'a'
+        if ( nodo.clave.compareTo( A ) == 0 ) {
+            if ( nodo.izq != null ) { cantidad += nodo.izq.tamano; }    // se suma el tamaño del subarbol izquierdo
+            return cantidad;
+        }
+
+
+        // recorrido
+            // 1. el nodo es mayor a 'a': recorrido izquierdo (no suma nada a cantidad)
+        if ( nodo.clave.compareTo( A ) > 0 ) {
+            return CountSmallerA( A, nodo.izq, cantidad ); // (<-)
+        }
+
+            // 2. el nodo es menor que 'a': recorrido derecho (suma el nodo y el tamaño de
+            //     su subarbol izquierdo a cantidad)
+        if ( nodo.clave.compareTo( A ) < 0 ) {
+            int cant_izq = 0;
+            if ( nodo.izq != null ) { cant_izq = nodo.izq.tamano; } // sumo el subarbol izquierdo a cantidad
+            return CountSmallerA( A, nodo.der, cantidad ) + 1 + cant_izq; // (->)
+        }
+        return -1;
+    } // <-> end CountSmallerA method (priv)
+
+
+
+    // retorna la cantidad de elementos que son mayores que 'b' (fuera de rango)
+    private int CountSmallerB ( K B, Nodo<K, V> nodo , int cantidad ) {
+        this.visitas++;
+        // casos bases
+            // 1. se encuentra una hoja nula (subarbol vacio)
+        if ( nodo == null ) { return cantidad; }
+
+            // 2. se encuentra 'a'
+        if ( nodo.clave.compareTo( B ) == 0 ) {
+            if ( nodo.der != null ) { cantidad += nodo.der.tamano; }    // se suma el tamaño del subarbol derecho
+            return cantidad;
+        }
+
+
+        // recorrido
+            // 1. el nodo es mayor a 'b': recorrido izquierdo (suma el nodo y el tamaño de
+            //     su subarbol derecho)
+        if ( nodo.clave.compareTo( B ) > 0 ) {
+            int cant_der = 0;
+            if ( nodo.der != null ) { cant_der = nodo.der.tamano; } // sumo el subarbol derecho a cantidad
+            return CountSmallerB( B, nodo.izq, cantidad ) + 1 + cant_der; // (<-)
+        }
+
+            // 2. el nodo es menor que 'b': recorrido derecho (no le suma nada a cantidad)
+        if ( nodo.clave.compareTo( B ) < 0 ) {
+            return CountSmallerB( B, nodo.der, cantidad ); // (->)
+        }
+        return -1;
+    } // <-> end CountSmallerB method (priv)
+
+
+
+    // ConsultarRango ------------------------------------------------------------------------------------
 
 } // <> end ABBAumentado class
