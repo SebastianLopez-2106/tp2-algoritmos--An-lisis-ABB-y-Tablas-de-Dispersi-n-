@@ -81,7 +81,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
         return -1;
     } // <-> end agregar recursivo method
-    // agregar -------------------------------------------------------------------------------------------
+    // agregar -------------------------------------------------------------------------------------------+
 
 
     // Eliminar >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -216,7 +216,24 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
     } // <-> end extraer_sucesor method (priv)
 
-    // Eliminar -------------------------------------------------------------------------------------------
+    // Eliminar -------------------------------------------------------------------------------------------+
+
+
+
+    public V obtener ( K clave ) throws ClaveInexistenteException {
+        if ( clave == null ) { throw new ClaveNulaException(); }
+
+        Nodo<K, V> nodo = raiz;
+        while ( nodo != null ) {
+            if ( nodo.clave.compareTo( clave ) == 0 ) { return nodo.valor; }
+
+            if ( nodo.clave.compareTo( clave ) < 0 ) { nodo = nodo.der; }
+            else { nodo = nodo.izq; }
+        }
+
+        throw new ClaveInexistenteException("clave inexistente");
+    } // <-> end obtener method
+
 
 
     public int cuantosMenores ( K clave) {
@@ -224,7 +241,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
         // CountSmallerA se encuentra en ConsultarRango
         return CountSmallerA( clave, raiz, 0 );
-    }
+    } // <-> end cuantosMenores method
 
 
 
@@ -234,7 +251,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
         if ( a.compareTo( b ) > 0 ) { throw new RangoInvalidoException(" a < b (Rango invalido)"); }
 
         return raiz.tamano - CountSmallerA( a, raiz, 0 ) - CountSmallerB( b, raiz, 0 );
-    }
+    } // <-> end consultarRango method
 
 
 
@@ -299,9 +316,6 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
         }
         return -1;
     } // <-> end CountSmallerB method (priv)
-
-
-
-    // ConsultarRango ------------------------------------------------------------------------------------
+    // ConsultarRango ------------------------------------------------------------------------------------+
 
 } // <> end ABBAumentado class
