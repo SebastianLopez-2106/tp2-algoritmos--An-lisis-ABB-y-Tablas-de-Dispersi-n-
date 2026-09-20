@@ -196,7 +196,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
     } // <-> end eliminar_recursivo method (priv)
 
 
- 
+
         // esta funcion la utiliza eliminar_recursivo
     private Nodo<K, V> extraer_sucesor ( Nodo<K, V> padre, Nodo<K, V> hijo ) {
         this.visitas++;
@@ -225,6 +225,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
         Nodo<K, V> nodo = raiz;
         while ( nodo != null ) {
+            this.visitas++;
             if ( nodo.clave.compareTo( clave ) == 0 ) { return nodo.valor; }
 
             if ( nodo.clave.compareTo( clave ) < 0 ) { nodo = nodo.der; }
@@ -250,6 +251,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
         if ( a == null || b == null ) { throw new ClaveNulaException(); }
         if ( a.compareTo( b ) > 0 ) { throw new RangoInvalidoException(" a < b (Rango invalido)"); }
 
+        if ( raiz == null ) { return 0; }
         return raiz.tamano - CountSmallerA( a, raiz, 0 ) - CountSmallerB( b, raiz, 0 );
     } // <-> end consultarRango method
 
@@ -257,10 +259,11 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
     // retorna la cantidad de elementos que son menores que 'a' (fuera de rango)
     private int CountSmallerA ( K A, Nodo<K, V> nodo , int cantidad ) {
-        this.visitas++;
         // casos bases
             // 1. se encuentra una hoja nula (subarbol vacio)
         if ( nodo == null ) { return cantidad; }
+
+        this.visitas++;
 
             // 2. se encuentra 'a'
         if ( nodo.clave.compareTo( A ) == 0 ) {
@@ -289,10 +292,11 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
     // retorna la cantidad de elementos que son mayores que 'b' (fuera de rango)
     private int CountSmallerB ( K B, Nodo<K, V> nodo , int cantidad ) {
-        this.visitas++;
         // casos bases
             // 1. se encuentra una hoja nula (subarbol vacio)
         if ( nodo == null ) { return cantidad; }
+
+        this.visitas++;
 
             // 2. se encuentra 'a'
         if ( nodo.clave.compareTo( B ) == 0 ) {
@@ -317,5 +321,82 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
         return -1;
     } // <-> end CountSmallerB method (priv)
     // ConsultarRango ------------------------------------------------------------------------------------+
+
+
+
+    public K sucesor ( K clave ) throws ClaveInexistenteException {
+        if ( clave == null ) { throw new ClaveNulaException(); }
+
+        Nodo<K, V> nodo = raiz;
+        K posible_sucesor = null; // MODIFICADO: guarda el ultimo ancestro por el que bajamos a la izquierda
+
+        while ( nodo != null ) {
+            this.visitas++; // MODIFICADO: incrementa el contador de visitas al mirar un nodo
+
+            if ( nodo.clave.compareTo( clave ) == 0) {
+
+                if ( nodo.der != null ) { // MODIFICADO: si tiene rama derecha, buscamos el minimo ahi
+                    Nodo <K, V> nodo2 = nodo.der;
+                    while ( nodo2 != null ) {
+                        this.visitas++; // MODIFICADO: incrementa visitas en el sub-bucle
+                        if ( nodo2.izq == null ) { return nodo2.clave; }
+
+                        nodo2 = nodo2.izq;
+                    }
+                }
+
+                return posible_sucesor; // MODIFICADO: si no hay rama derecha, retorna el ancestro guardado (o null si es el maximo)
+            }
+
+            if ( nodo.clave.compareTo( clave ) < 0 ) {
+                nodo = nodo.der;
+            }
+            else if ( nodo.clave.compareTo( clave ) > 0 ) {
+                posible_sucesor = nodo.clave; // MODIFICADO: guardamos este nodo como candidato antes de bajar a la izquierda
+                nodo = nodo.izq;
+            }
+        }
+
+        throw new ClaveInexistenteException("clave inexistente");
+    } // <-> end sucesor method
+
+
+
+    public K predecesor ( K clave ) throws ClaveInexistenteException {
+        if ( clave == null ) { throw new ClaveNulaException(); }
+
+        Nodo<K, V> nodo = raiz;
+        K posible_predecesor = null; // MODIFICADO: guarda el ultimo ancestro por el que bajamos a la derecha
+
+        while ( nodo != null ) {
+            this.visitas++; // MODIFICADO: incrementa el contador de visitas al mirar un nodo
+
+            if ( nodo.clave.compareTo( clave ) == 0) {
+
+                if ( nodo.izq != null ) { // MODIFICADO: si tiene rama izquierda, buscamos el maximo ahi
+                    Nodo <K, V> nodo2 = nodo.izq;
+                    while ( nodo2 != null ) {
+                        this.visitas++; // MODIFICADO: incrementa visitas en el sub-bucle
+                        if ( nodo2.der == null ) { return nodo2.clave; }
+
+                        nodo2 = nodo2.der;
+                    }
+                }
+
+                return posible_predecesor; // MODIFICADO: si no hay rama izquierda, retorna el ancestro guardado (o null si es el minimo)
+            }
+
+            if ( nodo.clave.compareTo( clave ) < 0 ) {
+                posible_predecesor = nodo.clave; // MODIFICADO: guardamos este nodo como candidato antes de bajar a la derecha
+                nodo = nodo.der;
+            }
+            else if ( nodo.clave.compareTo( clave ) > 0 ) {
+                nodo = nodo.izq;
+            }
+        }
+
+        throw new ClaveInexistenteException("clave inexistente");
+    } // <-> end predecesor method
+
 
 } // <> end ABBAumentado class
