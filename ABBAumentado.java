@@ -1,4 +1,24 @@
-public class ABBAumentado <K extends Comparable<? super K>, V> {
+/**
+ * Grupo: g_tq24
+ * Integrantes:
+ * - Lopez Guerreros, Sebastian Alejandro, 6.153.672, TQ
+ * - Oviedo Fernandez, Blas Nazario, 7.037.075, TQ
+ *
+ * Declaración de Honor:
+ * • Nosotros Sebastian Lopez y Blas Oviedo:
+ * • No hemos discutido el código fuente de nuestra tarea con ningún otro
+ *   grupo, solo con el Profesor o el AER.
+ * • No hemos usado código obtenido de otro estudiante o de cualquier otra
+ *   fuente no autorizada, modificada o no modificada.
+ * • Cualquier código o documentación utilizada en nuestro programa
+ *   obtenido de fuentes, tales como libros o notas de curso, han sido claramente
+ *   indicada en nuestra tarea
+ */
+
+
+import java.util.Iterator;
+
+public class ABBAumentado <K extends Comparable<? super K>, V> implements Iterable<K> {
 
     public static class Nodo <K, V> {
         K clave;
@@ -11,9 +31,12 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
             this.valor = valor;
             izq = der = null;
             tamano = 1;
-        } // <--> end Nodo constructor
+        } 
 
-
+        // Getters
+        public K clave() { return clave; }
+        public V valor() { return valor; }
+        public int tamano() { return tamano; }
     } // <-> end Nodo class
 
 
@@ -397,6 +420,189 @@ public class ABBAumentado <K extends Comparable<? super K>, V> {
 
         throw new ClaveInexistenteException("clave inexistente");
     } // <-> end predecesor method
+
+
+
+    // tamanosConsistentes >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public boolean tamanosConsistentes () { return verificar_recursivo(raiz) >= 0; } // <-> end tamanosConsistentes method
+
+
+
+    private int verificar_recursivo ( Nodo<K, V> nodo ) {
+        if ( nodo == null ) { return 0; }
+
+        int nodo_izq = verificar_recursivo ( nodo.izq );
+        int nodo_der = verificar_recursivo ( nodo.der );
+
+        if ( nodo_izq < 0 || nodo_der < 0 ) { return -1; }
+
+        if ( nodo.tamano == 1 + nodo_izq + nodo_der ) { return nodo.tamano; }
+        else { return -1; }
+    } // <-> end verificar_recursivo method (priv)
+    // tamanosConsistentes ----------------------------------------------------------------------+
+
+
+
+    // buscarNodo >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    Nodo<K, V> buscarNodo ( K clave ) {
+        if ( clave == null ) { throw new ClaveNulaException(); }
+
+        Nodo<K, V> nodo = raiz;
+        while ( nodo != null ) {
+            this.visitas++;
+            if ( nodo.clave.compareTo( clave ) == 0 ) { return nodo; }
+
+            if ( nodo.clave.compareTo( clave ) < 0 ) { nodo = nodo.der; }
+            else { nodo = nodo.izq; }
+        }
+
+        return null;
+    } // <-> end buscarNodo method
+    // buscarNodo ----------------------------------------------------------------------------------------+
+
+
+
+    public boolean contiene ( K clave ) {
+        if ( clave == null ) { throw new ClaveNulaException(); }
+
+        return buscarNodo( clave ) != null;
+    } // <-> end contiene method
+
+
+
+    // kEsimo >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // k-esimo menor (1-based), baja por un solo camino mirando el tamano del hijo izquierdo
+    public K kEsimo ( int k ) {
+        if ( k < 1 || k > size() ) { throw new IndiceFueraDeRangoException("k fuera de rango"); }
+
+        Nodo<K, V> nodo = raiz;
+        while ( nodo != null ) {
+            this.visitas++;
+
+            int tam_izq = 0;
+            if ( nodo.izq != null ) { tam_izq = nodo.izq.tamano; }
+
+            if ( k == tam_izq + 1 ) { return nodo.clave; }  // este nodo es la respuesta
+
+            if ( k <= tam_izq ) { nodo = nodo.izq; }    // (<-) con el mismo k
+            else {
+                k = k - tam_izq - 1;    // (->) se descartan el lado izquierdo y este nodo
+                nodo = nodo.der;
+            }
+        }
+
+        return null;    // no deberia llegar si los tamanos son consistentes
+    } // <-> end kEsimo method
+    // kEsimo --------------------------------------------------------------------------------------------+
+
+
+
+    public int size () {
+        if ( raiz == null ) { return 0; }
+        return raiz.tamano;
+    } // <-> end size method
+
+
+
+    public long visitas () { return this.visitas; } // <-> end visitas method
+
+    public void reiniciarVisitas () { this.visitas = 0; } // <-> end reiniciarVisitas method
+
+
+
+    // toString >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // inorden con tamanos
+    public String toString () {
+        return toString_recursivo( raiz ).trim();
+    } // <-> end toString method
+
+
+
+    private String toString_recursivo ( Nodo<K, V> nodo ) {
+        if ( nodo == null ) { return ""; }
+
+        return toString_recursivo( nodo.izq ) + nodo.clave + "(" + nodo.tamano + ") " + toString_recursivo( nodo.der );
+    } // <-> end toString_recursivo method (priv)
+    // toString ------------------------------------------------------------------------------------------+
+
+
+
+    // altura >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public int altura() {
+        return altura_recursiva(raiz);
+    }
+
+    private int altura_recursiva(Nodo<K, V> nodo) {
+        if (nodo == null) { return -1; }
+        int alt_izq = altura_recursiva(nodo.izq);
+        int alt_der = altura_recursiva(nodo.der);
+        return 1 + Math.max(alt_izq, alt_der);
+    }
+    // altura -----------------------------------------------------------------------------------------+
+
+
+
+    // consultarRangoIngenuo >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public int consultarRangoIngenuo(K a, K b) {
+        if (a == null || b == null) { throw new ClaveNulaException(); }
+        if (a.compareTo(b) > 0) { throw new RangoInvalidoException("a > b"); }
+        return inorden_ingenuo(raiz, a, b);
+    }
+
+    private int inorden_ingenuo(Nodo<K, V> nodo, K a, K b) {
+        if (nodo == null) { return 0; }
+        this.visitas++;
+        int count = 0;
+        count += inorden_ingenuo(nodo.izq, a, b);
+        if (nodo.clave.compareTo(a) >= 0 && nodo.clave.compareTo(b) <= 0) {
+            count++;
+        }
+        count += inorden_ingenuo(nodo.der, a, b);
+        return count;
+    }
+    // consultarRangoIngenuo --------------------------------------------------------------------------+
+
+
+
+
+    public int rango(K clave) throws ClaveInexistenteException {
+        if (clave == null) { throw new ClaveNulaException(); }
+        if (!contiene(clave)) { throw new ClaveInexistenteException("clave inexistente"); }
+        return cuantosMenores(clave) + 1;
+    }
+
+
+
+    // iterator >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    @Override
+    public Iterator<K> iterator() {
+        @SuppressWarnings("unchecked")
+        K[] elementos = (K[]) new Comparable[size()];
+        llenar_inorden(raiz, elementos, new int[]{0});
+
+        return new Iterator<K>() {
+            private int i = 0;
+
+            @Override
+            public boolean hasNext() { return i < elementos.length; }
+
+            @Override
+            public K next() {
+                if (!hasNext()) throw new RuntimeException("No hay elementos");
+                return elementos[i++];
+            }
+        };
+    } // <-> end Iterator method
+
+    private void llenar_inorden(Nodo<K, V> nodo, K[] arr, int[] idx) {
+        if (nodo == null) return;
+        llenar_inorden(nodo.izq, arr, idx);
+        arr[idx[0]++] = nodo.clave;
+        llenar_inorden(nodo.der, arr, idx);
+    } // <-> end llenar_inorder method
+    // iterator ---------------------------------------------------------------------------------------+
+
+
 
 
 } // <> end ABBAumentado class

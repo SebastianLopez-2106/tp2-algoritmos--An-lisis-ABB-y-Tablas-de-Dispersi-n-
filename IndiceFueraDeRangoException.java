@@ -15,10 +15,10 @@
  *   indicada en nuestra tarea
  */
 
-// Es una excepción no chequeada (extiende RuntimeException) porque indica un error
-// de programación de quien llama al pasar un parámetro inválido[cite: 1].
-public class ClaveNulaException extends RuntimeException {
-    public ClaveNulaException () {
-        super("clave null");
+// Es una excepción no chequeada (extiende RuntimeException) porque es provocada
+// por un índice mal calculado (error del programador)
+public class IndiceFueraDeRangoException extends RuntimeException {
+    public IndiceFueraDeRangoException (String message) {
+        super(message);
     }
 }
