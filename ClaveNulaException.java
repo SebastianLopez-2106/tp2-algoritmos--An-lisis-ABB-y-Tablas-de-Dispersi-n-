@@ -16,7 +16,7 @@
  */
 
 // Es una excepción no chequeada (extiende RuntimeException) porque indica un error
-// de programación de quien llama al pasar un parámetro inválido[cite: 1].
+// de programación de quien llama al pasar un parámetro inválido.
 public class ClaveNulaException extends RuntimeException {
     public ClaveNulaException () {
         super("clave null");

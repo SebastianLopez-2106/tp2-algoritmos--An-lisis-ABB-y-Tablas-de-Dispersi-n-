@@ -28,25 +28,25 @@ public class TestABBAumentado {
         System.out.println("(inicial)\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + arbol.altura());
         for (int c : claves) {
             arbol.agregar(c, "P" + c);
-            System.out.println("agregar(" + c + ")\t\t" + arbol.toString() + "\t\t\t\t" + arbol.altura());
+            System.out.println("agregar(" + c + ")\t\t" + arbol.toString() + "\t\t\t\t" + arbol.altura() + "\tsize: " + arbol.size() + "\tconsistentes: " + arbol.tamanosConsistentes());
         }
 
         System.out.println("\n=== FASE B: Consultas ===");
         arbol.reiniciarVisitas();
         System.out.println("kEsimo(6) -> " + arbol.kEsimo(6) + " | visitas: " + arbol.visitas());
-        
+
         arbol.reiniciarVisitas();
         System.out.println("cuantosMenores(65) -> " + arbol.cuantosMenores(65) + " | visitas: " + arbol.visitas());
-        
+
         arbol.reiniciarVisitas();
         System.out.println("cuantosMenores(35) -> " + arbol.cuantosMenores(35) + " | visitas: " + arbol.visitas());
-        
+
         arbol.reiniciarVisitas();
         System.out.println("consultarRango(35, 65) -> " + arbol.consultarRango(35, 65) + " | visitas: " + arbol.visitas());
-        
+
         arbol.reiniciarVisitas();
         System.out.println("rangoIngenuo(35, 65) -> " + arbol.consultarRangoIngenuo(35, 65) + " | visitas: " + arbol.visitas());
-        
+
         System.out.println("sucesor(40) -> " + arbol.sucesor(40));
         System.out.println("sucesor(80) -> " + arbol.sucesor(80));
         System.out.println("predecesor(35) -> " + arbol.predecesor(35));
@@ -55,7 +55,7 @@ public class TestABBAumentado {
         System.out.println("\n=== FASE C: Eliminar ===");
         arbol.reiniciarVisitas();
         System.out.println("eliminar(30) -> " + arbol.eliminar(30));
-        System.out.println(arbol.toString() + "\t\taltura: " + arbol.altura());
+        System.out.println(arbol.toString() + "\t\taltura: " + arbol.altura() + "\tsize: " + arbol.size() + "\tconsistentes: " + arbol.tamanosConsistentes());
 
         System.out.println("\nRecorrido For-Each (Iterador):");
         for (Integer clave : arbol) {
@@ -66,7 +66,7 @@ public class TestABBAumentado {
         System.out.println("\n=== FASE D: Tabla de visitas (Experimento) ===");
         System.out.println("N\t\th_aleat\th_ord\tvis_kEsimo_aleat\tvis_kEsimo_ord\tvis_rango_aum\tvis_rango_ing");
         int[] N_vals = {2000, 4000, 6000, 8000, 10000};
-        
+
         for (int N : N_vals) {
             ABBAumentado<Integer, String> arb_aleat = new ABBAumentado<>();
             ABBAumentado<Integer, String> arb_ord = new ABBAumentado<>();
@@ -75,7 +75,7 @@ public class TestABBAumentado {
             for (int i = 1; i <= N; i++) {
                 arb_ord.agregar(i, "V");
             }
-            
+
             // Aleatorio (Fisher-Yates)
             Random rng = new Random(2026);
             int[] arr = new int[N];

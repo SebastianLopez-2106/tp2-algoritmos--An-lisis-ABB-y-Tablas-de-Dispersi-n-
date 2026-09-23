@@ -67,7 +67,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> implements Iterab
         // para utilizarlo en agregar
     private short agregar_recursivo ( K clave, V valor, Nodo<K, V> nodo ) {
         this.visitas += 1;
-        short tamaño_extra;
+        short tamano_extra;
 
         // clave repetida
         if ( clave.compareTo(nodo.clave) == 0 ) {
@@ -83,9 +83,9 @@ public class ABBAumentado <K extends Comparable<? super K>, V> implements Iterab
                 return 1;   // retorna 1 para modificar los tamaños de sus ancestros +1
             }
 
-            tamaño_extra = agregar_recursivo( clave, valor, nodo.izq );    // recorrer a la izquierda (<-)
-            nodo.tamano += tamaño_extra;
-            return tamaño_extra;
+            tamano_extra = agregar_recursivo( clave, valor, nodo.izq );    // recorrer a la izquierda (<-)
+            nodo.tamano += tamano_extra;
+            return tamano_extra;
 
         // clave > nodo.clave (->)
         } else if ( clave.compareTo( nodo.clave ) > 0 ) {
@@ -96,9 +96,9 @@ public class ABBAumentado <K extends Comparable<? super K>, V> implements Iterab
                 return 1;   // retorna 1 para modificar los tamaños de sus ancestros +1
             }
 
-            tamaño_extra = agregar_recursivo( clave, valor, nodo.der );    // recocrrer a la derecha (->)
-            nodo.tamano += tamaño_extra;
-            return tamaño_extra;
+            tamano_extra = agregar_recursivo( clave, valor, nodo.der );    // recocrrer a la derecha (->)
+            nodo.tamano += tamano_extra;
+            return tamano_extra;
         }
 
 
@@ -272,7 +272,7 @@ public class ABBAumentado <K extends Comparable<? super K>, V> implements Iterab
     // ConsultarRango >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public int consultarRango ( K a, K b) {
         if ( a == null || b == null ) { throw new ClaveNulaException(); }
-        if ( a.compareTo( b ) > 0 ) { throw new RangoInvalidoException(" a < b (Rango invalido)"); }
+        if ( a.compareTo( b ) > 0 ) { throw new RangoInvalidoException(" a > b (Rango invalido)"); }
 
         if ( raiz == null ) { return 0; }
         return raiz.tamano - CountSmallerA( a, raiz, 0 ) - CountSmallerB( b, raiz, 0 );
